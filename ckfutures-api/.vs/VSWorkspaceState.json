@@ -1,0 +1,16 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\app",
+    "\\app\\Http",
+    "\\app\\Http\\Controllers",
+    "\\app\\Http\\Controllers\\api",
+    "\\app\\Models",
+    "\\database",
+    "\\database\\factories",
+    "\\database\\migrations",
+    "\\routes"
+  ],
+  "SelectedNode": "\\app\\Http\\Controllers\\api\\TreeController.php",
+  "PreviewInSolutionExplorer": false
+}
