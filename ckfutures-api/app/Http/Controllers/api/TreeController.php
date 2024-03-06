@@ -5,6 +5,7 @@ namespace App\Http\Controllers\api;
 use App\Models\Tree;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Validator;
 
 class TreeController extends Controller
 {
@@ -35,6 +36,54 @@ class TreeController extends Controller
             ];
             return response()->json($data, 404);
         }
+        
+    }
+
+    public function store(Request $request) {
+        $validator = Validator::make($request->all(), [
+            'creation_date' => 'required|date', 
+            'id_user' => 'required|integer|exists:users,id', 
+            'species' => 'required|string|max:255', 
+            'latitude' => 'required|numeric|between:-90,90', // latitude values range between -90 and 90
+            'longitude' => 'required|numeric|between:-180,180', // longitude values range between -180 and 180
+            'health_status' => 'nullable|string|max:24', 
+            'circumference' => 'nullable|numeric|between:0,9999.9', 
+            'planted' => 'nullable|date', 
+            'height' => 'nullable|integer|min:0', 
+            'is_deleted' => 'nullable|boolean', 
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        } else {
+            $tree = Tree::create([
+                'creation_date' => $request->creation_date,
+                'id_user' => $request->id_user,
+                'species' => $request->species,
+                'latitude' => $request->latitude,
+                'longitude' => $request->longitude,
+                'health_status' => $request->health_status,
+                'circumference' => $request->circumference,
+                'planted' => $request->planted,
+                'height' => $request->height,
+                'is_deleted' => $request->is_deleted
+            ]);
+
+            if ($tree) {
+                $data = [
+                    'status' => 200,
+                    'message' => "Tree Created Successfully"
+                ];
+                return response()->json($data, 200);
+            } else {
+                $data = [
+                    'status' => 500,
+                    'message' => "Error Adding Tree"
+                ];
+                return response()->json($data, 500);
+            }
+        }
+    
         
     }
 }
