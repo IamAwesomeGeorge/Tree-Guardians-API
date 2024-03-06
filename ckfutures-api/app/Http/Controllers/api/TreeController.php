@@ -42,7 +42,7 @@ class TreeController extends Controller
     public function store(Request $request) {
         $validator = Validator::make($request->all(), [
             'creation_date' => 'required|date', 
-            'id_user' => 'required|integer|exists:users,id', 
+            'id_user' => 'required|integer|exists:user,id', 
             'species' => 'required|string|max:255', 
             'latitude' => 'required|numeric|between:-90,90', // latitude values range between -90 and 90
             'longitude' => 'required|numeric|between:-180,180', // longitude values range between -180 and 180

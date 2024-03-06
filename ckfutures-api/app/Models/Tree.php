@@ -10,6 +10,7 @@ class Tree extends Model
     use HasFactory;
 
     protected $table = 'tree';
+    public $timestamps = false;
 
     protected $fillable = [
         'creation_date',
