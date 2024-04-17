@@ -22,4 +22,3 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::get('tree', [TreeController::class, 'index']);
 Route::post('tree', [TreeController::class, 'store']);
-Route::post('locationCheck', [LocationCheckController::class, 'store']);
