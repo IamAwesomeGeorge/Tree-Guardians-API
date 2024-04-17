@@ -6,6 +6,7 @@ use App\Models\Tree;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
+use Carbon\Carbon;
 
 class TreeController extends Controller
 {
@@ -40,8 +41,7 @@ class TreeController extends Controller
     }
 
     public function store(Request $request) {
-        $validator = Validator::make($request->all(), [
-            'creation_date' => 'required|date', 
+        $validator = Validator::make($request->all(), [ 
             'id_user' => 'required|integer|exists:user,id', 
             'species' => 'required|string|max:255', 
             'latitude' => 'required|numeric|between:-90,90', // latitude values range between -90 and 90
@@ -50,14 +50,13 @@ class TreeController extends Controller
             'circumference' => 'nullable|numeric|between:0,9999.9', 
             'planted' => 'nullable|date', 
             'height' => 'nullable|integer|min:0', 
-            'is_deleted' => 'nullable|boolean', 
         ]);
 
         if ($validator->fails()) {
             return response()->json($validator->errors(), 422);
         } else {
             $tree = Tree::create([
-                'creation_date' => $request->creation_date,
+                'creation_date' => Carbon::now(),
                 'id_user' => $request->id_user,
                 'species' => $request->species,
                 'latitude' => $request->latitude,
@@ -66,7 +65,7 @@ class TreeController extends Controller
                 'circumference' => $request->circumference,
                 'planted' => $request->planted,
                 'height' => $request->height,
-                'is_deleted' => $request->is_deleted
+                'is_deleted' => 0
             ]);
 
             if ($tree) {
