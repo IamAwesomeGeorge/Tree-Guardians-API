@@ -20,8 +20,8 @@ class Tree extends Model
         'longitude',
         'health_status',
         'circumference',
-        'planted',
         'height',
+        'planted',
         'is_deleted'
     ];
 
