@@ -3,7 +3,6 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\api\TreeController;
-use App\Http\Controllers\api\Test;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,4 +21,3 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::get('tree', [TreeController::class, 'index']);
 Route::post('tree', [TreeController::class, 'store']);
-Route::get('test', [Test::class, 'index']);
