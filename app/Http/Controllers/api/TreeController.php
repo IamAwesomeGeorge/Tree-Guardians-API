@@ -48,8 +48,8 @@ class TreeController extends Controller
             'longitude' => 'required|numeric|between:-180,180', // longitude values range between -180 and 180
             'health_status' => 'nullable|string|max:24', 
             'circumference' => 'nullable|numeric|between:0,9999.9', 
-            'planted' => 'nullable|date', 
             'height' => 'nullable|integer|min:0', 
+            'planted' => 'nullable|date', 
         ]);
 
         if ($validator->fails()) {
@@ -63,8 +63,8 @@ class TreeController extends Controller
                 'longitude' => $request->longitude,
                 'health_status' => $request->health_status,
                 'circumference' => $request->circumference,
-                'planted' => $request->planted,
                 'height' => $request->height,
+                'planted' => $request->planted,
                 'is_deleted' => 0
             ]);
 
