@@ -13,16 +13,14 @@ class Tree extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'creation_date',
         'id_user',
         'species',
         'latitude',
         'longitude',
         'health_status',
-        'circumference',
-        'height',
         'planted',
-        'is_deleted'
+        'circumference',
+        'height'
     ];
 
 }
