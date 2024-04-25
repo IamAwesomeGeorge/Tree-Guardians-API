@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\api\ImageController;
 use App\Http\Controllers\api\LandingPageController;
 use App\Http\Controllers\api\TreeController;
 
@@ -23,6 +24,9 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::get('tree', [TreeController::class, 'index']);
 Route::post('tree', [TreeController::class, 'store']);
+Route::get('tree/image', [ImageController::class, 'index']);
+Route::post('tree/image', [ImageController::class, 'store']);
+#Fails catch
 Route::get('{any}', [LandingPageController::class, 'index'])->where('any', '.*');
 Route::get('user', [LandingPageController::class, 'index'])->where('any', '.*');
 Route::get('', [LandingPageController::class, 'index'])->where('any', '.*');
