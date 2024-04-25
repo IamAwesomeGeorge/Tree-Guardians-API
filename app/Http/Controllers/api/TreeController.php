@@ -11,21 +11,19 @@ use Carbon\Carbon;
 
 class TreeController extends Controller
 {
-    public function index() {
-
+    public function index()
+    {
         try {
             $trees = Tree::all();
-        }
-        catch (\Throwable $e) {
+        } catch (\Throwable $e) {
             $data = [
                 'status' => 500,
                 'trees' => "Database Error"
             ];
             return response()->json($data, 500);
         };
-        
 
-        if($trees->count() > 0) {
+        if ($trees->count() > 0) {
             $data = [
                 'status' => 200,
                 'trees' => $trees
@@ -38,34 +36,28 @@ class TreeController extends Controller
             ];
             return response()->json($data, 404);
         }
-        
     }
 
-    public function store(Request $request) {
-        $validator = Validator::make($request->all(), [ 
-            'id_user' => 'required|integer|exists:user,id', 
-            'species' => 'required|string|max:255', 
+    public function store(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'id_user' => 'required|string|exists:user,id|max:36',
+            'species' => 'required|string|exists:species,species|max:255',
             'latitude' => 'required|numeric|between:-90,90', // latitude values range between -90 and 90
             'longitude' => 'required|numeric|between:-180,180', // longitude values range between -180 and 180
-            'health_status' => 'nullable|string|max:24', 
-            'circumference' => 'nullable|numeric|between:0,9999.9', 
-            'height' => 'nullable|integer|min:0', 
-            'planted' => 'nullable|date', 
+            'health_status' => 'nullable|string|max:24',
+            'circumference' => 'nullable|numeric|between:0,9999.9',
+            'height' => 'nullable|integer|min:0',
+            'planted' => 'nullable|date',
         ]);
 
         if ($validator->fails()) {
             return response()->json($validator->errors(), 422);
         } else {
-
-            // Get the input latitude and longitude
             $latitude = $request->latitude;
             $longitude = $request->longitude;
-
-            // Count how many times a line from the input point to infinity crosses the polygon boundaries
-            $count = $this->rayCasting($latitude, $longitude);
-
-            // If count is odd, the point is inside the polygon, otherwise, it's outside
-            $isInside = ($count % 2 == 1);
+            $count = $this->rayCasting($latitude, $longitude); // Ray Casting Algorithm
+            $isInside = ($count % 2 == 1); // If count is odd, then tree is in area
 
             if ($isInside === false) {
                 $data = [
@@ -73,32 +65,39 @@ class TreeController extends Controller
                     'message' => "Location not in the area"
                 ];
                 return response()->json($data, 422);
-            }
-            else {
-
-                $tree = Tree::create([
-                    'creation_date' => Carbon::now(),
-                    'id_user' => $request->id_user,
-                    'species' => $request->species,
-                    'latitude' => $request->latitude,
-                    'longitude' => $request->longitude,
-                    'health_status' => $request->health_status,
-                    'circumference' => $request->circumference,
-                    'height' => $request->height,
-                    'planted' => $request->planted,
-                    'is_deleted' => 0
-                ]);
-
-                if ($tree) {
-                    $data = [
-                        'status' => 200,
-                        'message' => "Tree Created Successfully"
-                    ];
-                    return response()->json($data, 200);
-                } else {
+            } else {
+                try {
+                    $tree = Tree::create([
+                        'creation_date' => Carbon::now(),
+                        'id_user' => $request->id_user,
+                        'species' => $request->species,
+                        'latitude' => $request->latitude,
+                        'longitude' => $request->longitude,
+                        'health_status' => $request->health_status,
+                        'circumference' => $request->circumference,
+                        'height' => $request->height,
+                        'planted' => $request->planted,
+                        'is_deleted' => 0
+                    ]);
+                    if ($tree) {
+                        $data = [
+                            'status' => 200,
+                            'message' => "Tree Created Successfully",
+                            'tree' => $tree
+                        ];
+                        return response()->json($data, 200);
+                    } else {
+                        $data = [
+                            'status' => 500,
+                            'message' => "Error Adding Tree"
+                        ];
+                        return response()->json($data, 500);
+                    }
+                } catch (\Throwable $e) {
                     $data = [
                         'status' => 500,
-                        'message' => "Error Adding Tree"
+                        'message' => "Image Upload Error",
+                        'error' => $e->getMessage()
                     ];
                     return response()->json($data, 500);
                 }

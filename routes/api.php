@@ -20,6 +20,9 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::get('', [LandingPageController::class, 'index']);
+
 Route::get('tree', [TreeController::class, 'index']);
 Route::post('tree', [TreeController::class, 'store']);
+Route::get('{any}', [LandingPageController::class, 'index'])->where('any', '.*');
+Route::get('user', [LandingPageController::class, 'index'])->where('any', '.*');
+Route::get('', [LandingPageController::class, 'index'])->where('any', '.*');
