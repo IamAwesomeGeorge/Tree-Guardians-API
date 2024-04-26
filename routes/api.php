@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\api\LandingPageController;
+use App\Http\Controllers\api\SpeciesController;
 use App\Http\Controllers\api\TreeController;
 use App\Http\Controllers\api\TreeImageController;
 use App\Http\Controllers\api\UserImageController;
@@ -30,6 +31,9 @@ Route::get('tree/image', [TreeImageController::class, 'index']);
 Route::post('tree/image', [TreeImageController::class, 'store']);
 Route::get('user/image', [UserImageController::class, 'index']);
 Route::post('user/image', [UserImageController::class, 'store']);
+Route::get('species', [SpeciesController::class, 'index']);
+Route::post('species', [SpeciesController::class, 'store']);
+
 #Fails catch
 Route::get('{any}', [LandingPageController::class, 'index'])->where('any', '.*');
 Route::get('user', [LandingPageController::class, 'index'])->where('any', '.*');
