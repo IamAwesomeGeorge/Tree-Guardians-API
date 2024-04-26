@@ -2,16 +2,14 @@
 
 namespace App\Http\Controllers\api;
 
-use App\Models\TreeImage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\Controller;
-use Carbon\Carbon;
 
 class UserImageController extends Controller
 {
-    public function getUserImage(Request $request)
+    public function index(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'id_user' => 'required|string|exists:user,id|max:36'
@@ -36,7 +34,7 @@ class UserImageController extends Controller
             return response()->json($data, 200);
         }
     }
-    public function storeUserImage(Request $request)
+    public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'image' => 'required|image|mimes:jpg,jpeg,png|max:512',
