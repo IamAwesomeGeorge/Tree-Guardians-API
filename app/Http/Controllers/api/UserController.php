@@ -5,7 +5,6 @@ namespace App\Http\Controllers\api;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
@@ -17,7 +16,7 @@ class UserController extends Controller
 
         $validator = Validator::make($request->all(), [
             'email' => 'required|string|max:255',
-            'password' => 'required|string|max:255',
+            'pass_hash' => 'required|string|max:255',
             'username' => 'required|string|max:255'
         ]);
 
@@ -38,7 +37,7 @@ class UserController extends Controller
                     $user = User::create([
                         'id_user' => $this->makerUserID(),
                         'email' => $request->email,
-                        'pass_hash' => Hash::make($request->password),
+                        'pass_hash' => $request->pass_hash,
                         'username' => $request->username,
                         'creation_date' => Carbon::now(),
                         'id_user_type' => 1
@@ -85,7 +84,7 @@ class UserController extends Controller
 
             $user = User::where('email', $request->email)->first();
 
-            if ($user && (Hash::check($request->password, $user->pass_hash))) {
+            if ($user && ($request->pass_hash === $user->pass_hash)) {
                 return response()->json(['message' => 'Login successful', 'user' => $user], 200);
             } else {
                 return response()->json(['message' => 'Invalid credentials'], 401);
