@@ -18,14 +18,14 @@ class UserImageController extends Controller
             return response()->json($validator->errors(), 422);
         } else {
 
-            if (Storage::exists('/storage/images/user/img-' . $request->id_user . '.png')) {
-                $pfpURL = asset('/storage/images/user/img-' . $request->id_user . '.png');
-            } elseif (Storage::exists('/storage/images/user/img-' . $request->id_user . '.jpg')) {
-                $pfpURL = asset('/storage/images/user/img-' . $request->id_user . '.jpg');
-            } elseif (Storage::exists('/storage/images/user/img-' . $request->id_user . '.jpeg')) {
-                $pfpURL = asset('/storage/images/user/img-' . $request->id_user . '.jpeg');
+            if (Storage::exists('public/images/user/img-' . $request->id_user . '.png')) {
+                $pfpURL = asset('storage/images/user/img-' . $request->id_user . '.png');
+            } elseif (Storage::exists('public/images/user/img-' . $request->id_user . '.jpg')) {
+                $pfpURL = asset('storage/images/user/img-' . $request->id_user . '.jpg');
+            } elseif (Storage::exists('public/images/user/img-' . $request->id_user . '.jpeg')) {
+                $pfpURL = asset('storage/images/user/img-' . $request->id_user . '.jpeg');
             } else {
-                $pfpURL = asset('/img-defaultPFP.jpg');
+                $pfpURL = asset('img-defaultPFP.jpg');
             }
             $data = [
                 'status' => 200,
