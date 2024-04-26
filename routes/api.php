@@ -6,6 +6,7 @@ use App\Http\Controllers\api\LandingPageController;
 use App\Http\Controllers\api\SpeciesController;
 use App\Http\Controllers\api\TreeController;
 use App\Http\Controllers\api\TreeImageController;
+use App\Http\Controllers\api\UserController;
 use App\Http\Controllers\api\UserImageController;
 
 
@@ -29,6 +30,8 @@ Route::get('tree', [TreeController::class, 'index']);
 Route::post('tree', [TreeController::class, 'store']);
 Route::get('tree/image', [TreeImageController::class, 'index']);
 Route::post('tree/image', [TreeImageController::class, 'store']);
+Route::post('user/newUser', [UserController::class, 'newUser']);
+Route::post('user/logIn', [UserController::class, 'logIn']);
 Route::get('user/image', [UserImageController::class, 'index']);
 Route::post('user/image', [UserImageController::class, 'store']);
 Route::get('species', [SpeciesController::class, 'index']);
