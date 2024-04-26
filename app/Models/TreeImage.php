@@ -15,6 +15,7 @@ class TreeImage extends Model
     protected $fillable = [
         'id_tree',
         'image_index',
+        'file_type',
         'id_user',
         'upload_date'
     ];
