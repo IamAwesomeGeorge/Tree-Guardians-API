@@ -8,5 +8,6 @@
 <body>
     <h1>Welcome to Our Landing Page!</h1>
     <p>This is a basic landing page created using Laravel.</p>
+    <iframe width="560" height="315" src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
 </body>
 </html>
