@@ -62,7 +62,7 @@ class TreeController extends Controller
             'species' => 'required|string|exists:species,species|max:255',
             'latitude' => 'required|numeric|between:-90,90', // latitude values range between -90 and 90
             'longitude' => 'required|numeric|between:-180,180', // longitude values range between -180 and 180
-            'health_status' => 'nullable|string|max:24',
+            'health_status' => 'nullable|string|exists:health_status,health_status|max:24',
             'circumference' => 'nullable|numeric|between:0,9999.9',
             'height' => 'nullable|integer|min:0',
             'planted' => 'nullable|date',
@@ -78,10 +78,10 @@ class TreeController extends Controller
 
             if ($isInside === false) {
                 $data = [
-                    'status' => 422,
+                    'status' => 403,
                     'message' => "Location not in the area"
                 ];
-                return response()->json($data, 422);
+                return response()->json($data, 403);
             } else {
                 try {
                     $tree = Tree::create([
@@ -113,7 +113,7 @@ class TreeController extends Controller
                 } catch (\Throwable $e) {
                     $data = [
                         'status' => 500,
-                        'message' => "Image Upload Error",
+                        'message' => "Tree Creation Error",
                         'error' => $e->getMessage()
                     ];
                     return response()->json($data, 500);
