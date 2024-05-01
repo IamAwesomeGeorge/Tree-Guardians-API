@@ -11,10 +11,10 @@ use Carbon\Carbon;
 
 class TreeController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         try {
-            $trees = Tree::all();
+            Tree::all();
         } catch (\Throwable $e) {
             $data = [
                 'status' => 500,
@@ -22,19 +22,36 @@ class TreeController extends Controller
             ];
             return response()->json($data, 500);
         };
-
-        if ($trees->count() > 0) {
-            $data = [
-                'status' => 200,
-                'trees' => $trees
-            ];
-            return response()->json($data, 200);
+        if ($request->has('id')) {
+            $tree = Tree::find($request->id);
+            if ($tree) {
+                $data = [
+                    'status' => 200,
+                    'tree' => $tree
+                ];
+                return response()->json($data, 200);
+            } else {
+                $data = [
+                    'status' => 404,
+                    'tree' => "Tree not found"
+                ];
+                return response()->json($data, 404);
+            }
         } else {
-            $data = [
-                'status' => 404,
-                'trees' => "Not Found"
-            ];
-            return response()->json($data, 404);
+            $trees = Tree::all();
+            if ($trees->count() > 0) {
+                $data = [
+                    'status' => 200,
+                    'trees' => $trees
+                ];
+                return response()->json($data, 200);
+            } else {
+                $data = [
+                    'status' => 404,
+                    'message' => "No trees found"
+                ];
+                return response()->json($data, 404);
+            }
         }
     }
 
