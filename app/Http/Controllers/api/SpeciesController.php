@@ -16,7 +16,7 @@ class SpeciesController extends Controller
         catch (\Throwable $e) {
             $data = [
                 'status' => 500,
-                'trees' => "Database Error"
+                'species' => "Database Error"
             ];
             return response()->json($data, 500);
         };
@@ -25,13 +25,13 @@ class SpeciesController extends Controller
         if($species->count() > 0) {
             $data = [
                 'status' => 200,
-                'trees' => $species
+                'species' => $species
             ];
             return response()->json($data, 200);
         } else {
             $data = [
                 'status' => 404,
-                'trees' => "Not Found"
+                'species' => "Not Found"
             ];
             return response()->json($data, 404);
         }
