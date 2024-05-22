@@ -38,7 +38,7 @@ class TreeController extends Controller
                 return response()->json($data, 404);
             }
         } else {
-            $trees = Tree::all();
+            $trees = Tree::where('is_deleted', 0)->get();
             if ($trees->count() > 0) {
                 $data = [
                     'status' => 200,
