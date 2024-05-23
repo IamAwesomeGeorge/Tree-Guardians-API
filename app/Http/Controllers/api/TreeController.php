@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\api;
 
 use App\Models\Tree;
+use App\Models\User;
+use App\Models\ChangeLog;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
@@ -84,31 +86,69 @@ class TreeController extends Controller
                 return response()->json($data, 403);
             } else {
                 try {
-                    $tree = Tree::create([
-                        'creation_date' => Carbon::now(),
-                        'id_user' => $request->id_user,
-                        'species' => $request->species,
-                        'latitude' => $request->latitude,
-                        'longitude' => $request->longitude,
-                        'health_status' => $request->health_status,
-                        'circumference' => $request->circumference,
-                        'height' => $request->height,
-                        'planted' => $request->planted,
-                        'is_deleted' => 0
-                    ]);
-                    if ($tree) {
-                        $data = [
-                            'status' => 200,
-                            'message' => "Tree Created Successfully",
-                            'tree' => $tree
+                    $user = User::find($request->id_user);
+                    if ($user->id_user_type == 1) {
+                        $tree = [
+                            'id_user' => $request->id_user,
+                            'species' => $request->species,
+                            'latitude' => $request->latitude,
+                            'longitude' => $request->longitude,
+                            'health_status' => $request->health_status,
+                            'circumference' => $request->circumference,
+                            'height' => $request->height,
+                            'planted' => $request->planted,
+                            'is_deleted' => 0
                         ];
-                        return response()->json($data, 200);
+
+                        $changeLog = ChangeLog::create([
+                            'id_user' => $request->id_user,
+                            'date' => Carbon::now(),
+                            'new_values' => json_encode($tree),
+                            'table_name' => 'tree',
+                            'operation' => 'INSERT'
+                        ]);
+                        if ($changeLog) {
+                            $data = [
+                                'status' => 200,
+                                'message' => "Tree added to change log",
+                                'tree' => $tree,
+                                'change_log' => $changeLog
+                            ];
+                            return response()->json($data, 200);
+                        } else {
+                            $data = [
+                                'status' => 500,
+                                'message' => "Error Adding Tree"
+                            ];
+                            return response()->json($data, 500);
+                        }
                     } else {
-                        $data = [
-                            'status' => 500,
-                            'message' => "Error Adding Tree"
-                        ];
-                        return response()->json($data, 500);
+                        $tree = Tree::create([
+                            'creation_date' => Carbon::now(),
+                            'id_user' => $request->id_user,
+                            'species' => $request->species,
+                            'latitude' => $request->latitude,
+                            'longitude' => $request->longitude,
+                            'health_status' => $request->health_status,
+                            'circumference' => $request->circumference,
+                            'height' => $request->height,
+                            'planted' => $request->planted,
+                            'is_deleted' => 0
+                        ]);
+                        if ($tree) {
+                            $data = [
+                                'status' => 200,
+                                'message' => "Tree Created Successfully",
+                                'tree' => $tree
+                            ];
+                            return response()->json($data, 200);
+                        } else {
+                            $data = [
+                                'status' => 500,
+                                'message' => "Error Adding Tree"
+                            ];
+                            return response()->json($data, 500);
+                        }
                     }
                 } catch (\Throwable $e) {
                     $data = [
@@ -121,7 +161,6 @@ class TreeController extends Controller
             }
         }
     }
-
 
     // Ray casting algorithm implementation
     private function rayCasting($lat, $lon)
@@ -154,5 +193,114 @@ class TreeController extends Controller
         }
 
         return $count;
+    }
+
+    public function delete(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'id' => 'required|int|exists:tree,id',
+            'id_user' => 'required|string|exists:user,id|max:36'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        } else {
+            try {
+                $tree = Tree::find($request->id);
+                if ($tree) {
+                    $tree->is_deleted = 1;
+                    $tree->save();
+                    $data = [
+                        'status' => 200,
+                        'message' => "Tree Deleted Successfully"
+                    ];
+                    return response()->json($data, 200);
+                } else {
+                    $data = [
+                        'status' => 404,
+                        'message' => "Tree not found"
+                    ];
+                    return response()->json($data, 404);
+                }
+            } catch (\Throwable $e) {
+                $data = [
+                    'status' => 500,
+                    'message' => "Tree Deletion Error",
+                    'error' => $e->getMessage()
+                ];
+                return response()->json($data, 500);
+            }
+        }
+    }
+
+    public function update(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'id' => 'required|int|exists:tree,id',
+            'id_user' => 'required|string|exists:user,id|max:36',
+            'species' => 'nullable|string|exists:species,species|max:255',
+            'latitude' => 'nullable|numeric|between:-90,90', // latitude values range between -90 and 90
+            'longitude' => 'nullable|numeric|between:-180,180', // longitude values range between -180 and 180
+            'health_status' => 'nullable|string|exists:health_status,health_status|max:24',
+            'circumference' => 'nullable|numeric|between:0,9999.9',
+            'height' => 'nullable|integer|min:0',
+            'planted' => 'nullable|date',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        } else {
+            try {
+                $tree = Tree::find($request->id);
+                if ($tree) {
+                    $orginalValues = $tree->toArray();
+                    $oldValues["id"] = $orginalValues["id"];
+                    $newValues["id"] = $orginalValues["id"];
+                    $fillableFields = ['species', 'latitude', 'longitude', 'health_status', 'circumference', 'height', 'planted'];
+                    foreach ($fillableFields as $field) {
+                        if ($request->has($field)) {
+                            $oldValues[$field] = $orginalValues[$field];
+                            $newValues[$field] = $request->input($field);
+                        }
+                    }
+                    $changeLog = ChangeLog::create([
+                        'id_user' => $request->id_user,
+                        'date' => Carbon::now(),
+                        'old_values' => json_encode($oldValues),
+                        'new_values' => json_encode($newValues),
+                        'table_name' => 'tree',
+                        'operation' => 'UPDATE'
+                    ]);
+                    if ($changeLog) {
+                        $data = [
+                            'status' => 200,
+                            'message' => "Tree added to change log",
+                            'tree' => $tree,
+                            'change_log' => $changeLog
+                        ];
+                        return response()->json($data, 200);
+                    } else {
+                        $data = [
+                            'status' => 500,
+                            'message' => "Error Changing Tree"
+                        ];
+                        return response()->json($data, 500);
+                    }
+                } else {
+                    $data = [
+                        'status' => 404,
+                        'message' => "Tree not found"
+                    ];
+                    return response()->json($data, 404);
+                }
+            } catch (\Throwable $e) {
+                $data = [
+                    'status' => 500,
+                    'message' => "Tree Change Error",
+                    'error' => $e->getMessage()
+                ];
+                return response()->json($data, 500);
+            }
+        }
     }
 }
